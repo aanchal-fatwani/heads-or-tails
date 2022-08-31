@@ -1,0 +1,14 @@
+{
+  "name": "heads-or-tails",
+  "version": "2.0.0",
+  "description": "Returns heads or tails",
+  "license": "MIT",
+  "repository": "aanchal-fatwani/heads-or-tails",
+  "main": "index.js",
+  "keywords": [
+    "npm",
+    "package",
+    "heads",
+    "tails"
+  ]
+}
