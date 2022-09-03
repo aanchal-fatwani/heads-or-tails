@@ -1,0 +1,38 @@
+#############################
+# ENVIRONMENT VARIABLES
+# GITHUB_TOKEN - Personal Access Token created in Github Repo. 
+# PROJECT_DIR - Temporary workspace created through runner eg. /var/www/cicd
+#############################
+stages:
+    - deploy
+
+image: node:latest
+
+cache:
+  paths:
+    - node_modules/
+
+deploy:
+  stage: deploy
+  tags:
+    - my-test-runner
+  script:
+    - $EXCLUDE1 = Join-Path -Path $PWD -ChildPath node_modules
+    - $EXCLUDE2 = Join-Path -Path $PWD -ChildPath .git
+    - robocopy $PWD $PROJECT_DIR /XD $EXCLUDE1 /XD $EXCLUDE2 ; "IF %ERRORLEVEL% LSS 8 SET ERRORLEVEL = 0"
+    - Set-Location -Path $PROJECT_DIR
+    - $GIT_PATH = Join-Path -Path $PROJECT_DIR -ChildPath .git
+    - $IS_GIT_INITIALISED = Test-Path -Path $GIT_PATH
+    
+    - if (!$IS_GIT_INITIALISED) { git init; git checkout -b $CI_COMMIT_REF_NAME} ;
+    - git status 
+    - git config user.email $GITLAB_USER_EMAIL
+    - git config user.name $GITLAB_USER_NAME
+    - git add .
+    - git commit -m $CI_COMMIT_MESSAGE
+    - $GIT_REMOTE = (git config remote.origin.url)
+    - if (!$GIT_REMOTE) { git remote add origin https://aanchal-fatwani:$GITHUB_TOKEN@github.com/aanchal-fatwani/heads-or-tails.git} ;
+    - git pull origin $CI_COMMIT_REF_NAME --allow-unrelated-histories
+    - git push --set-upstream origin $CI_COMMIT_REF_NAME
+  only:
+    - development
