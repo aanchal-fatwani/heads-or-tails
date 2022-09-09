@@ -14,7 +14,4 @@ jobs:
       - run: npm test
       - uses: rymndhng/release-on-push-action@master
         with:
-          bump_version_scheme: patch
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
+          bump_version_scheme: major
