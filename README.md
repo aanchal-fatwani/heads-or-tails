@@ -1,4 +1,4 @@
-# heads-or-tails
+# Heads or Tails
 npm package to get heads or tails
 
 ## Install
