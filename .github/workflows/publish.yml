@@ -45,7 +45,7 @@ jobs:
           body: ${{ steps.tag_version.outputs.changelog }}
 
       - name: NPM Publish
+        if: ${{ env.CURRENT_VERSION_APPENDED != env.RELEASE_VERSION }}
         uses: JS-DevTools/npm-publish@v1
-        if: ${{ env.CURRENT_VERSION != env.RELEASE_VERSION }}
         with:
           token: ${{ secrets.NPM_TOKEN }}
