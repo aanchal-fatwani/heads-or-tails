@@ -14,19 +14,22 @@ jobs:
       - run: npm test
       
       - name: Get latest release tag
+        uses: rez0n/actions-github-release@main
         id: fetch-latest-release
-        uses: gregziegan/fetch-latest-release@v2.0.0
-        with:
-          github_token: ${{ secrets.RELEASE_TOKEN }}
-
+        env:
+          token: ${{ secrets.RELEASE_TOKEN }}
+          repository: "aanchal-fatwani/heads-or-tails"
+          type: "latest"
+  
       - name: Get versions
         run: |
           version=$(node -p "require('./package.json').version")
-          echo "CURRENT_VERSION=v$version" >> $GITHUB_ENV
-          echo "RELEASE_VERSION=${{steps.fetch-latest-release.outputs.tag_name}}" >> $GITHUB_ENV
+          echo "CURRENT_VERSION=$version" >> $GITHUB_ENV
+          echo "CURRENT_VERSION_APPENDED=v$version" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=${{steps.fetch-latest-release.outputs.release}}" >> $GITHUB_ENV
                     
       - name: Create release tag
-        if: ${{ env.CURRENT_VERSION != env.RELEASE_VERSION }}
+        if: ${{ env.CURRENT_VERSION_APPENDED != env.RELEASE_VERSION }}
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.0
         with:
@@ -34,7 +37,7 @@ jobs:
           custom_tag: ${{ env.CURRENT_VERSION }}
           
       - name: Create a GitHub release
-        if: ${{ env.CURRENT_VERSION != env.RELEASE_VERSION }}
+        if: ${{ env.CURRENT_VERSION_APPENDED != env.RELEASE_VERSION }}
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.tag_version.outputs.new_tag }}
